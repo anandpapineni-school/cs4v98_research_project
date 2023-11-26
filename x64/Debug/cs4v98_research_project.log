@@ -1,0 +1,38 @@
+﻿  Curve.cpp
+  main.cpp
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Shader.h(51,10): warning C4101: 'info_log': unreferenced local variable
+  (compiling source file 'main.cpp')
+  
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(79,23): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'main.cpp')
+  
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(173,23): warning C4305: 'argument': truncation from 'int' to 'T'
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(173,23): warning C4305:         with
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(173,23): warning C4305:         [
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(173,23): warning C4305:             T=float
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(173,23): warning C4305:         ]
+  (compiling source file 'main.cpp')
+  
+  Renderer.cpp
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Shader.h(51,10): warning C4101: 'info_log': unreferenced local variable
+  (compiling source file 'Renderer.cpp')
+  
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(79,23): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'Renderer.cpp')
+  
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(173,23): warning C4305: 'argument': truncation from 'int' to 'T'
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(173,23): warning C4305:         with
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(173,23): warning C4305:         [
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(173,23): warning C4305:             T=float
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(173,23): warning C4305:         ]
+  (compiling source file 'Renderer.cpp')
+  
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(274,24): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(321,58): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(331,58): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(336,58): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(343,54): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  Generating Code...
+glew32s.lib(glew.obj) : warning LNK4099: PDB '' was not found with 'glew32s.lib(glew.obj)' or at ''; linking object as if no debug info
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+  cs4v98_research_project.vcxproj -> C:\Users\theca\source\repos\cs4v98_research_project\x64\Debug\cs4v98_research_project.exe
