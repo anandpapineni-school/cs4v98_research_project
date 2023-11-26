@@ -12,16 +12,16 @@ C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Obje
 C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Object.h(173,23): warning C4305:         ]
   (compiling source file 'Renderer.cpp')
   
-C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(285,24): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(332,58): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(342,58): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(347,58): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(354,54): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(286,24): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(333,58): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(343,58): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(348,58): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\theca\source\repos\cs4v98_research_project\cs4v98_research_project\Renderer.cpp(355,54): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
 LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  4 of 1339 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
+  6 of 1339 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    4 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
 glew32s.lib(glew.obj) : warning LNK4099: PDB '' was not found with 'glew32s.lib(glew.obj)' or at ''; linking object as if no debug info
   cs4v98_research_project.vcxproj -> C:\Users\theca\source\repos\cs4v98_research_project\x64\Release\cs4v98_research_project.exe

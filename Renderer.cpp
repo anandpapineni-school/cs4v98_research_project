@@ -8,8 +8,11 @@ nanogui::Screen* Renderer::m_nanogui_screen = nullptr;
 
 Curve* Renderer::m_curve = new Curve();
 
-float m_clipPlaneHeight = 1.0f;
-float m_clipPlaneAngle = 0.0f;		
+float m_clipPlaneAngle = 0.0f;
+float xClip, zClip, clipOffset = 1.0f;
+float yClip = -1.0f;
+
+glm::vec4 clipVec(xClip, yClip, zClip,  clipOffset);
 
 bool Renderer::keys[1024];
 
@@ -43,10 +46,10 @@ void Renderer::nanogui_init(GLFWwindow* window)
 	gui_1->addVariable("Cam Y", m_camera->position[1])->setSpinnable(true);
 	gui_1->addVariable("Cam Z", m_camera->position[2])->setSpinnable(true);
 	gui_1->addGroup("Clip Plane Position");
-	/*gui_1->addVariable("Clip X");
-	gui_1->addVariable("Clip Y");
-	gui_1->addVariable("Clip Z");
-	gui_1->addVariable("Distance From Origin");*/
+	gui_1->addVariable("Clip X", clipVec.x)->setSpinnable(true);
+	gui_1->addVariable("Clip Y", clipVec.y)->setSpinnable(true);
+	gui_1->addVariable("Clip Z", clipVec.z)->setSpinnable(true);
+	gui_1->addVariable("Distance From Origin", clipVec.w)->setSpinnable(true);
 
 	gui_1->addButton("Reset Camera", []() {
 		m_camera->reset();
@@ -217,12 +220,10 @@ void Renderer::draw_scene(Shader& shader)
 	glClearColor(background_color[0], background_color[1], background_color[2], background_color[3]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_CLIP_DISTANCE0);
-	//gl_ClipDistance[0] = -1;
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
 	glDisable(GL_CULL_FACE);
-	//glCullFace(GL_FRONT);
 
 	glFrontFace(GL_CW);
 
@@ -356,9 +357,7 @@ void Renderer::draw_object(Shader& shader, Object& object)
 	glBindVertexArray(0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
-glm::vec4 Renderer::getClipVec(){
-	return glm::vec4(1, -1, 1, 5);
-}
+
 
 void Renderer::bind_vaovbo(Object &cur_obj)
 {
@@ -391,7 +390,7 @@ void Renderer::setup_uniform_values(Shader& shader)
 	glUniformMatrix4fv(glGetUniformLocation(shader.program, "projection"), 1, GL_FALSE, glm::value_ptr(m_camera->get_projection_mat()));
 	glUniformMatrix4fv(glGetUniformLocation(shader.program, "view"), 1, GL_FALSE, glm::value_ptr(m_camera->get_view_mat()));
 	//Clip Plane uniform vals
-	glUniform4fv(glGetUniformLocation(shader.program, "clipPlane"), 1, glm::value_ptr(getClipVec()));
+	glUniform4fv(glGetUniformLocation(shader.program, "clipPlane"), 1, glm::value_ptr(clipVec));
 
 	// Light uniform values
 	glUniform1i(glGetUniformLocation(shader.program, "dir_light.status"), m_lightings->direction_light.status);
