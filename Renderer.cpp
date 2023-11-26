@@ -153,6 +153,8 @@ void Renderer::display(GLFWwindow* window)
 		}
 
 		camera_move();
+		glEnable(GL_CLIP_DISTANCE0);
+		glDisable(GL_CULL_FACE);
 
 		m_shader.use();
 			
@@ -219,8 +221,8 @@ void Renderer::draw_scene(Shader& shader)
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	glDisable(GL_CULL_FACE);
+	//glCullFace(GL_FRONT);
 
 	glFrontFace(GL_CW);
 
@@ -354,6 +356,9 @@ void Renderer::draw_object(Shader& shader, Object& object)
 	glBindVertexArray(0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
+glm::vec4 Renderer::getClipVec(){
+	return glm::vec4(1, -1, 1, 5);
+}
 
 void Renderer::bind_vaovbo(Object &cur_obj)
 {
@@ -386,7 +391,7 @@ void Renderer::setup_uniform_values(Shader& shader)
 	glUniformMatrix4fv(glGetUniformLocation(shader.program, "projection"), 1, GL_FALSE, glm::value_ptr(m_camera->get_projection_mat()));
 	glUniformMatrix4fv(glGetUniformLocation(shader.program, "view"), 1, GL_FALSE, glm::value_ptr(m_camera->get_view_mat()));
 	//Clip Plane uniform vals
-	glGetUniformLocation(shader.program, "clipPlane");
+	glUniform4fv(glGetUniformLocation(shader.program, "clipPlane"), 1, glm::value_ptr(getClipVec()));
 
 	// Light uniform values
 	glUniform1i(glGetUniformLocation(shader.program, "dir_light.status"), m_lightings->direction_light.status);

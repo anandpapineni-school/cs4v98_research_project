@@ -60,6 +60,8 @@ public:
 
 	void load_models();
 
+	glm::vec4 getClipVec();
+
 	void draw_scene(Shader& shader);
 	void draw_object(Shader& shader, Object& object);
 
