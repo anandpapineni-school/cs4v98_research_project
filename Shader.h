@@ -80,6 +80,10 @@ public:
 			glDeleteShader(geometry);
 		}
 	}
+	void LoadClipPlane(glm::vec4)
+	{
+
+	}
 	void use() { glUseProgram(this->program); }
 
 private:

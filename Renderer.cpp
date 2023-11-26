@@ -8,6 +8,9 @@ nanogui::Screen* Renderer::m_nanogui_screen = nullptr;
 
 Curve* Renderer::m_curve = new Curve();
 
+float m_clipPlaneHeight = 1.0f;
+float m_clipPlaneAngle = 0.0f;		
+
 bool Renderer::keys[1024];
 
 Renderer::Renderer()
@@ -211,7 +214,8 @@ void Renderer::draw_scene(Shader& shader)
 	// Set up some basic parameters
 	glClearColor(background_color[0], background_color[1], background_color[2], background_color[3]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	glEnable(GL_CLIP_DISTANCE0);
+	//gl_ClipDistance[0] = -1;
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
@@ -228,19 +232,19 @@ void Renderer::draw_scene(Shader& shader)
 			for (unsigned int j = 0; j < m_curve->control_points_pos.size(); j++) {
 				glm::mat4 cur_obj_model_mat = glm::mat4(1.0f);
 				cur_obj_model_mat = glm::translate(cur_obj_model_mat, m_curve->control_points_pos[j]);
-				cur_obj_model_mat = glm::scale(cur_obj_model_mat, glm::vec3(0.2, 0.2, 0.2));
+				cur_obj_model_mat = glm::scale(cur_obj_model_mat, glm::vec3(3, 0.5, 1));
 				glUniformMatrix4fv(glGetUniformLocation(shader.program, "model"), 1, GL_FALSE, glm::value_ptr(cur_obj_model_mat));
 				draw_object(shader, obj_list[i]);
 			}
 
 		}
-		if (obj_list[i].obj_name == "curve") 
-		{
-			// Draw curve
-			glm::mat4 curve_model_mat =  glm::mat4(1.0f);
-			glUniformMatrix4fv(glGetUniformLocation(shader.program, "model"), 1, GL_FALSE, glm::value_ptr(curve_model_mat));
-			draw_object(shader, obj_list[i]);
-		}
+		//if (obj_list[i].obj_name == "curve") 
+		//{
+		//	// Draw curve
+		//	glm::mat4 curve_model_mat =  glm::mat4(1.0f);
+		//	glUniformMatrix4fv(glGetUniformLocation(shader.program, "model"), 1, GL_FALSE, glm::value_ptr(curve_model_mat));
+		//	draw_object(shader, obj_list[i]);
+		//}
 		if (obj_list[i].obj_name == "plane")
 		{
 			// Draw plane
@@ -381,6 +385,8 @@ void Renderer::setup_uniform_values(Shader& shader)
 
 	glUniformMatrix4fv(glGetUniformLocation(shader.program, "projection"), 1, GL_FALSE, glm::value_ptr(m_camera->get_projection_mat()));
 	glUniformMatrix4fv(glGetUniformLocation(shader.program, "view"), 1, GL_FALSE, glm::value_ptr(m_camera->get_view_mat()));
+	//Clip Plane uniform vals
+	glGetUniformLocation(shader.program, "clipPlane");
 
 	// Light uniform values
 	glUniform1i(glGetUniformLocation(shader.program, "dir_light.status"), m_lightings->direction_light.status);

@@ -39,6 +39,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform vec4 clipPlane;
+
 out vec3 final_color;
 
 vec3 cal_dir_light(Dir_Light light, vec3 normal, vec3 view_dir){
@@ -75,6 +77,7 @@ vec3 cal_point_light(Point_Light light, vec3 normal,vec3 frag_pos, vec3 view_dir
 
 void main(){
     gl_Position = projection * view * model * vec4(position, 1.0f);
+    gl_ClipDistance[0] = dot(model*vec4(position, 1.0f), clipPlane);
 
     vec3 frag_pos = vec3(model * vec4(position, 1.0f));
 
