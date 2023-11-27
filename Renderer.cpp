@@ -10,7 +10,9 @@ Curve* Renderer::m_curve = new Curve();
 
 float m_clipPlaneAngle = 0.0f;
 float xClip, zClip, clipOffset = 1.0f;
-float yClip = -1.0f;
+float yClip = 1.0f;
+
+glm::vec3 goalPos(0, 5, 0);
 
 glm::vec4 clipVec(xClip, yClip, zClip,  clipOffset);
 
@@ -31,6 +33,13 @@ void Renderer::nanogui_init(GLFWwindow* window)
 	m_nanogui_screen->initialize(window, true);
 
 	glViewport(0, 0, m_camera->width, m_camera->height);
+	glLoadIdentity();
+	
+	glViewport(0, m_camera->height / 2, m_camera->width / 2, m_camera->height);
+	glLoadIdentity();
+	gluLookAt(goalPos.x, goalPos.y, goalPos.z,
+		0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f);
 
 	//glfwSwapInterval(0);
 	//glfwSwapBuffers(window);
@@ -45,11 +54,17 @@ void Renderer::nanogui_init(GLFWwindow* window)
 	gui_1->addVariable("Cam X", m_camera->position[0])->setSpinnable(true);
 	gui_1->addVariable("Cam Y", m_camera->position[1])->setSpinnable(true);
 	gui_1->addVariable("Cam Z", m_camera->position[2])->setSpinnable(true);
+
 	gui_1->addGroup("Clip Plane Position");
 	gui_1->addVariable("Clip X", clipVec.x)->setSpinnable(true);
 	gui_1->addVariable("Clip Y", clipVec.y)->setSpinnable(true);
 	gui_1->addVariable("Clip Z", clipVec.z)->setSpinnable(true);
 	gui_1->addVariable("Distance From Origin", clipVec.w)->setSpinnable(true);
+
+	gui_1->addGroup("Goal Point Position");
+	gui_1->addVariable("Goal X", goalPos.x)->setSpinnable(true);
+	gui_1->addVariable("Goal Y", goalPos.y)->setSpinnable(true);
+	gui_1->addVariable("Goal Z", goalPos.z)->setSpinnable(true);
 
 	gui_1->addButton("Reset Camera", []() {
 		m_camera->reset();
@@ -189,6 +204,10 @@ void Renderer::load_models()
 	main_object.obj_color = glm::vec4(1.0, 1.0, 0.0, 1.0);
 	main_object.obj_name = "main_object";
 
+	Object goal_point("./objs/cube.obj");
+	goal_point.obj_color = glm::vec4(1.0, 0.0, 1.0, 1.0);
+	goal_point.obj_name = "goal_point";
+
 	Object plane_object("./objs/plane.obj");
 	plane_object.obj_color = glm::vec4(0.5, 0.5, 0.5, 1.0);
 	plane_object.obj_name = "plane";
@@ -206,12 +225,14 @@ void Renderer::load_models()
 	bind_vaovbo(plane_object);
 	bind_vaovbo(arrow_object);
 	bind_vaovbo(curve_object);
+	bind_vaovbo(goal_point);
 	
 	// Here we only load one model
 	obj_list.push_back(main_object);
 	obj_list.push_back(plane_object);
 	obj_list.push_back(arrow_object);
 	obj_list.push_back(curve_object);
+	obj_list.push_back(goal_point);
 }
 
 void Renderer::draw_scene(Shader& shader)
@@ -240,6 +261,15 @@ void Renderer::draw_scene(Shader& shader)
 				draw_object(shader, obj_list[i]);
 			}
 
+		}
+		if (obj_list[i].obj_name == "goal_point")
+		{
+			glm::mat4 cur_obj_model_mat = glm::mat4(1.0f);
+			cur_obj_model_mat = glm::translate(cur_obj_model_mat, goalPos);
+			cur_obj_model_mat = glm::scale(cur_obj_model_mat, glm::vec3(0.3, 0.3, 0.3));
+			obj_list[i].obj_color == glm::vec4(1.0f, 0, 0, 1.0f);
+			glUniformMatrix4fv(glGetUniformLocation(shader.program, "model"), 1, GL_FALSE, glm::value_ptr(cur_obj_model_mat));
+			draw_object(shader, obj_list[i]);
 		}
 		//if (obj_list[i].obj_name == "curve") 
 		//{
