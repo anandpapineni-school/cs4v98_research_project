@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "gl/GLU.h"
 
 Camera* Renderer::m_camera = new Camera();
 
@@ -35,20 +36,20 @@ void Renderer::nanogui_init(GLFWwindow* window)
 	glViewport(0, 0, m_camera->width, m_camera->height);
 	glLoadIdentity();
 	
-	glViewport(0, m_camera->height / 2, m_camera->width / 2, m_camera->height);
+	glViewport(0, 0, m_camera->width / 2, m_camera->height /2);
 	glLoadIdentity();
 	gluLookAt(goalPos.x, goalPos.y, goalPos.z,
 		0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f);
 
-	//glfwSwapInterval(0);
-	//glfwSwapBuffers(window);
+	glfwSwapInterval(0);
+	glfwSwapBuffers(window);
 
 	// Create nanogui gui
 	nanogui::FormHelper *gui_1 = new nanogui::FormHelper(m_nanogui_screen);
 	nanogui::ref<nanogui::Window> nanoguiWindow_1 = gui_1->addWindow(Eigen::Vector2i(0, 0), "Nanogui control bar_1");
 
-	//screen->setPosition(Eigen::Vector2i(-width/2 + 200, -height/2 + 300));
+	//m_nanogui_screen->setPosition(Eigen::Vector2i(m_camera->width /2 + 200, m_camera->height /2 + 300));
 
 	gui_1->addGroup("Camera Position");
 	gui_1->addVariable("Cam X", m_camera->position[0])->setSpinnable(true);
@@ -146,7 +147,7 @@ void Renderer::init()
 	m_curve->init();
 
 	// Create a GLFWwindow object that we can use for GLFW's functions
-	this->m_window = glfwCreateWindow(m_camera->width, m_camera->height, "Assignment 2", nullptr, nullptr);
+	this->m_window = glfwCreateWindow(m_camera->width, m_camera->height, "Research Project", nullptr, nullptr);
 	glfwMakeContextCurrent(this->m_window);
 
 	glewExperimental = GL_TRUE;
@@ -172,6 +173,7 @@ void Renderer::display(GLFWwindow* window)
 
 		camera_move();
 		glEnable(GL_CLIP_DISTANCE0);
+		glEnable(GL_VIEWPORT);
 		glDisable(GL_CULL_FACE);
 
 		m_shader.use();
@@ -242,6 +244,7 @@ void Renderer::draw_scene(Shader& shader)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_CLIP_DISTANCE0);
 	glEnable(GL_DEPTH_TEST);
+
 	glDepthFunc(GL_LESS);
 
 	glDisable(GL_CULL_FACE);
