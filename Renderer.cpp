@@ -10,12 +10,16 @@ nanogui::Screen* Renderer::m_nanogui_screen = nullptr;
 Curve* Renderer::m_curve = new Curve();
 
 float m_clipPlaneAngle = 0.0f;
-float xClip, zClip, clipOffset = 1.0f;
-float yClip = 1.0f;
+float xTopClip, zTopClip, clipOffset = 1.0f;
+float yTopClip = 1.0f;
 
 glm::vec3 goalPos(0, 5, 0);
 
-glm::vec4 clipVec(xClip, yClip, zClip,  clipOffset);
+bool camFollowGoal;
+bool planeFollowGoal;
+
+glm::vec4 topClipVec(xTopClip, yTopClip, zTopClip,  clipOffset);
+glm::vec4 bottomClipVec(topClipVec.x, topClipVec.y* (-1), topClipVec.z, topClipVec.w - 0.15);
 
 bool Renderer::keys[1024];
 
@@ -35,12 +39,6 @@ void Renderer::nanogui_init(GLFWwindow* window)
 
 	glViewport(0, 0, m_camera->width, m_camera->height);
 	glLoadIdentity();
-	
-	glViewport(0, 0, m_camera->width / 2, m_camera->height /2);
-	glLoadIdentity();
-	gluLookAt(goalPos.x, goalPos.y, goalPos.z,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f);
 
 	glfwSwapInterval(0);
 	glfwSwapBuffers(window);
@@ -57,15 +55,17 @@ void Renderer::nanogui_init(GLFWwindow* window)
 	gui_1->addVariable("Cam Z", m_camera->position[2])->setSpinnable(true);
 
 	gui_1->addGroup("Clip Plane Position");
-	gui_1->addVariable("Clip X", clipVec.x)->setSpinnable(true);
-	gui_1->addVariable("Clip Y", clipVec.y)->setSpinnable(true);
-	gui_1->addVariable("Clip Z", clipVec.z)->setSpinnable(true);
-	gui_1->addVariable("Distance From Origin", clipVec.w)->setSpinnable(true);
+	gui_1->addVariable("Clip X", topClipVec.x)->setSpinnable(true);
+	gui_1->addVariable("Clip Y", topClipVec.y)->setSpinnable(true);
+	gui_1->addVariable("Clip Z", topClipVec.z)->setSpinnable(true);
+	gui_1->addVariable("Distance From Origin", topClipVec.w)->setSpinnable(true);
+	gui_1->addVariable("Clip on Goal", planeFollowGoal);
 
 	gui_1->addGroup("Goal Point Position");
 	gui_1->addVariable("Goal X", goalPos.x)->setSpinnable(true);
 	gui_1->addVariable("Goal Y", goalPos.y)->setSpinnable(true);
 	gui_1->addVariable("Goal Z", goalPos.z)->setSpinnable(true);
+	gui_1->addVariable("Camera Follow Goal", camFollowGoal);
 
 	gui_1->addButton("Reset Camera", []() {
 		m_camera->reset();
@@ -146,8 +146,11 @@ void Renderer::init()
 	m_lightings->init();
 	m_curve->init();
 
+
 	// Create a GLFWwindow object that we can use for GLFW's functions
 	this->m_window = glfwCreateWindow(m_camera->width, m_camera->height, "Research Project", nullptr, nullptr);
+	this->crossWindow = glfwCreateWindow(m_camera->width, m_camera->height, "Cross Section", nullptr, nullptr);;
+
 	glfwMakeContextCurrent(this->m_window);
 
 	glewExperimental = GL_TRUE;
@@ -155,11 +158,11 @@ void Renderer::init()
 
 	nanogui_init(this->m_window);
 }
-
+	
 void Renderer::display(GLFWwindow* window)
 {
 	Shader m_shader = Shader("./shader/basic.vert", "./shader/basic.frag");
-
+	//displayCross(crossWindow);
 	// Main frame while loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -170,11 +173,22 @@ void Renderer::display(GLFWwindow* window)
 			scene_reset();
 			is_scene_reset = false;
 		}
+		gluLookAt(goalPos.x, goalPos.y, goalPos.z,	
+		0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f);
+		if (planeFollowGoal)
+		{
+			topClipVec.w = goalPos.y;
+		}
 
 		camera_move();
-		glEnable(GL_CLIP_DISTANCE0);
+		glEnable(GL_CLIP_DISTANCE1);
 		glEnable(GL_VIEWPORT);
 		glDisable(GL_CULL_FACE);
+
+
+		bottomClipVec = glm::vec4(topClipVec.x, topClipVec.y *( - 1), topClipVec.z, topClipVec.w - 0.15);
+
 
 		m_shader.use();
 			
@@ -183,9 +197,48 @@ void Renderer::display(GLFWwindow* window)
 		draw_scene(m_shader);
 
 		m_nanogui_screen->drawWidgets();
-
+		
 		// Swap the screen buffers
 		glfwSwapBuffers(window);
+	}
+
+	// Terminate GLFW, clearing any resources allocated by GLFW.
+	glfwTerminate();
+	return;
+}
+
+void Renderer::displayCross(GLFWwindow* cWindow)
+{
+	Shader m_shader = Shader("./shader/basic.vert", "./shader/basic.frag");
+	glfwMakeContextCurrent(cWindow);
+
+	// Main frame while loop
+	while (!glfwWindowShouldClose(cWindow))
+	{
+
+		glfwPollEvents();
+
+		if (is_scene_reset) {
+			scene_reset();
+			is_scene_reset = false;
+		}
+
+		//camera_move();
+		glEnable(GL_CLIP_DISTANCE1);
+		glEnable(GL_VIEWPORT);
+		//glPolygonMode(GL)
+		glDisable(GL_CULL_FACE);
+
+		m_shader.use();
+
+		setup_uniform_values(m_shader);
+
+		draw_scene(m_shader);
+
+		m_nanogui_screen->drawWidgets();
+
+		// Swap the screen buffers
+		glfwSwapBuffers(cWindow);
 	}
 
 	// Terminate GLFW, clearing any resources allocated by GLFW.
@@ -242,7 +295,7 @@ void Renderer::draw_scene(Shader& shader)
 	// Set up some basic parameters
 	glClearColor(background_color[0], background_color[1], background_color[2], background_color[3]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_CLIP_DISTANCE0);
+	glEnable(GL_CLIP_DISTANCE1);
 	glEnable(GL_DEPTH_TEST);
 
 	glDepthFunc(GL_LESS);
@@ -310,6 +363,7 @@ void Renderer::draw_scene(Shader& shader)
 			obj_list[i].obj_color = glm::vec4(0, 0, 1, 1);
 			draw_object(shader,obj_list[i]);
 		}
+
 	}
 }
 
@@ -320,18 +374,26 @@ void Renderer::camera_move()
 	delta_time = current_frame - last_frame;
 	last_frame = current_frame;
 	// Camera controls
-	if (keys[GLFW_KEY_W])
-		m_camera->process_keyboard(FORWARD, delta_time);
-	if (keys[GLFW_KEY_S])
-		m_camera->process_keyboard(BACKWARD, delta_time);
-	if (keys[GLFW_KEY_A])
-		m_camera->process_keyboard(LEFT, delta_time);
-	if (keys[GLFW_KEY_D])
-		m_camera->process_keyboard(RIGHT, delta_time);
-	if (keys[GLFW_KEY_Q])
-		m_camera->process_keyboard(UP, delta_time);
-	if (keys[GLFW_KEY_E])
-		m_camera->process_keyboard(DOWN, delta_time);
+	if (camFollowGoal)
+	{
+		m_camera->position[0] = goalPos.x;
+		m_camera->position[1] = goalPos.y;
+		m_camera->position[2] = goalPos.z+15;
+	}
+	else {
+		if (keys[GLFW_KEY_W])
+			m_camera->process_keyboard(FORWARD, delta_time);
+		if (keys[GLFW_KEY_S])
+			m_camera->process_keyboard(BACKWARD, delta_time);
+		if (keys[GLFW_KEY_A])
+			m_camera->process_keyboard(LEFT, delta_time);
+		if (keys[GLFW_KEY_D])
+			m_camera->process_keyboard(RIGHT, delta_time);
+		if (keys[GLFW_KEY_Q])
+			m_camera->process_keyboard(UP, delta_time);
+		if (keys[GLFW_KEY_E])
+			m_camera->process_keyboard(DOWN, delta_time);
+	}
 	if (keys[GLFW_KEY_I])
 		m_camera->process_keyboard(ROTATE_X_UP, delta_time);
 	if (keys[GLFW_KEY_K])
@@ -344,6 +406,7 @@ void Renderer::camera_move()
 		m_camera->process_keyboard(ROTATE_Z_UP, delta_time);
 	if (keys[GLFW_KEY_O])
 		m_camera->process_keyboard(ROTATE_Z_DOWN, delta_time);
+
 }
 
 void Renderer::draw_object(Shader& shader, Object& object)
@@ -372,19 +435,19 @@ void Renderer::draw_object(Shader& shader, Object& object)
 		glLineWidth(20.0);
 		if (object.m_obj_type == OBJ_POINTS)
 		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			glDrawArrays(GL_LINE_LOOP, 0, object.vao_vertices.size());
 		}
 		if (object.m_obj_type == OBJ_TRIANGLES)
 		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			glDrawArrays(GL_TRIANGLES, 0, object.vao_vertices.size());
 		}
 	}
 
 	if (object.m_obj_type == RENDER_POINTS)
 	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_POINTS);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDrawArrays(GL_POINTS, 0, object.vao_vertices.size());
 	}
 	glBindVertexArray(0);
@@ -423,7 +486,8 @@ void Renderer::setup_uniform_values(Shader& shader)
 	glUniformMatrix4fv(glGetUniformLocation(shader.program, "projection"), 1, GL_FALSE, glm::value_ptr(m_camera->get_projection_mat()));
 	glUniformMatrix4fv(glGetUniformLocation(shader.program, "view"), 1, GL_FALSE, glm::value_ptr(m_camera->get_view_mat()));
 	//Clip Plane uniform vals
-	glUniform4fv(glGetUniformLocation(shader.program, "clipPlane"), 1, glm::value_ptr(clipVec));
+	glUniform4fv(glGetUniformLocation(shader.program, "topClipPlane"), 1, glm::value_ptr(topClipVec));
+	glUniform4fv(glGetUniformLocation(shader.program, "bottomClipPlane"), 1, glm::value_ptr(bottomClipVec));
 
 	// Light uniform values
 	glUniform1i(glGetUniformLocation(shader.program, "dir_light.status"), m_lightings->direction_light.status);

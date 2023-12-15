@@ -25,6 +25,7 @@ class Renderer
 {
 public:
 	GLFWwindow* m_window;
+	GLFWwindow* crossWindow;
 
 	static Camera* m_camera;
 
@@ -55,6 +56,7 @@ public:
 	void init();
 
 	void display(GLFWwindow* window);
+	void displayCross(GLFWwindow* cWindow);
 	void run();
 
 	void camera_move();
